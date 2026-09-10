@@ -19,6 +19,6 @@ class Calculator:
 c = Calculator()
 
 print(c.add(10.0, 20.0))     # 30.0
-# print(c.add(5, 7))       # 12.0
+print(c.add(5, 7))       # 12.0
 
 # print(c.add(10.5, 20))   # TypeError
