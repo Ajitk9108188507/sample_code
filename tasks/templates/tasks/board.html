@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html>
+
+<head>
+
+    <title>Smart Task Board</title>
+
+    <style>
+
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 1000px;
+            margin: 40px auto;
+            padding: 20px;
+            background: #f5f5f5;
+        }
+
+        h1 {
+            text-align: center;
+        }
+
+        .form-container {
+            background: white;
+            padding: 20px;
+            border-radius: 10px;
+            margin-bottom: 30px;
+        }
+
+        .task {
+            background: white;
+            padding: 20px;
+            margin-bottom: 15px;
+            border-radius: 10px;
+            border-left: 6px solid #777;
+        }
+
+        .LOW {
+            border-left-color: green;
+        }
+
+        .MEDIUM {
+            border-left-color: orange;
+        }
+
+        .HIGH {
+            border-left-color: red;
+        }
+
+        .LOCKED {
+            opacity: 0.6;
+        }
+
+        .COMPLETED {
+            opacity: 0.7;
+        }
+
+        button {
+            padding: 8px 16px;
+            cursor: pointer;
+        }
+
+        .message {
+            padding: 12px;
+            background: #fff3cd;
+            margin-bottom: 10px;
+            border-radius: 5px;
+        }
+
+    </style>
+
+</head>
+
+
+<body>
+
+<h1> Smart Task Board</h1>
+
+
+{% if messages %}
+
+    {% for message in messages %}
+
+        <div class="message">
+            {{ message }}
+        </div>
+
+    {% endfor %}
+
+{% endif %}
+
+
+<div class="form-container">
+
+    <h2>Add Task</h2>
+
+    <form method="POST">
+
+        {% csrf_token %}
+
+        {{ form.as_p }}
+
+        <button type="submit">
+            Add Task
+        </button>
+
+    </form>
+
+</div>
+
+
+<h2>Tasks</h2>
+
+
+{% for task in tasks %}
+
+    <div class="task {{ task.priority }}">
+
+        <h3>{{ task.title }}</h3>
+
+        <p>
+            <strong>Priority:</strong>
+            {{ task.get_priority_display }}
+        </p>
+
+        <p>
+            <strong>Estimated Time:</strong>
+            {{ task.estimated_time }} minutes
+        </p>
+
+        <p>
+            <strong>Created:</strong>
+            {{ task.created_at|date:"Y-m-d H:i:s" }}
+        </p>
+
+        <p>
+            <strong>Status:</strong>
+            {{ task.get_status_display }}
+        </p>
+
+
+        {% if task.status == "LOCKED" %}
+
+            <p>
+                🔒 Task is locked for 5 minutes.
+            </p>
+
+        {% elif task.status == "COMPLETED" %}
+
+            <p>
+                ✅ Completed
+            </p>
+
+        {% elif task.status == "EXPIRED" %}
+
+            <p>
+                ⏰ Time expired
+            </p>
+
+        {% else %}
+
+            <form
+                method="POST"
+                action="{% url 'complete' task.id %}"
+            >
+
+                {% csrf_token %}
+
+                <button type="submit">
+                    Complete
+                </button>
+
+            </form>
+
+        {% endif %}
+
+    </div>
+
+{% empty %}
+
+    <p>No tasks yet.</p>
+
+{% endfor %}
+
+
+</body>
+
+</html>
